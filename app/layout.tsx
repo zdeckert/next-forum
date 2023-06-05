@@ -1,5 +1,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Login from "./login";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,7 +16,11 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en">
-			<body className={inter.className}>{children}</body>
+			<body>
+				{/* @ts-expect-error next version of TS will fix this */}
+				<Login />
+				{children}
+			</body>
 		</html>
 	);
 }

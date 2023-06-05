@@ -1,7 +1,20 @@
-export default function Home() {
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import NewPost from "./new-post";
+import RealtimePosts from "./realtime-posts";
+
+import type { Database } from "@/lib/database.types";
+
+export default async function ServerComponent() {
+	const supabase = createServerComponentClient<Database>({
+		cookies,
+	});
+	const { data } = await supabase.from("posts").select("*");
+
 	return (
-		<main>
-			<h1>Hello World</h1>
-		</main>
+		<>
+			<NewPost />
+			<RealtimePosts serverPosts={data ?? []} />
+		</>
 	);
 }
