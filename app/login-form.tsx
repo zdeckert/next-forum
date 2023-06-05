@@ -41,18 +41,19 @@ export default function LoginForm({ session }: { session: Session | null }) {
 		const { data, error } = await supabase.auth.signInWithOAuth({
 			provider: "google",
 		});
+		router.refresh();
 	}
 
 	// for the `session` to be available on first SSR render, it must be
 	// fetched in a Server Component and passed down as a prop
 	return session ? (
-		<button className="btn btn-primary" onClick={handleSignOut}>
+		<button className="btn btn-sm btn-secondary" onClick={handleSignOut}>
 			Sign out
 		</button>
 	) : (
 		<>
 			<button
-				className="btn btn-primary col-span-1"
+				className="btn btn-sm btn-primary col-span-1"
 				/* @ts-expect-error */
 				onClick={() => window.login_modal.showModal()}
 			>
@@ -65,7 +66,7 @@ export default function LoginForm({ session }: { session: Session | null }) {
 				>
 					<div className="col-span-2 flex justify-center">
 						<button
-							className="btn btn-nuetral w-1/2"
+							className="btn btn-sm btn-nuetral w-1/2"
 							onClick={signInWithGoogle}
 						>
 							<Image
@@ -99,14 +100,14 @@ export default function LoginForm({ session }: { session: Session | null }) {
 					/>
 
 					<button
-						className="btn btn-secondary col-span-1"
+						className="btn btn-sm btn-secondary col-span-1"
 						onClick={handleSignIn}
 						disabled={!(email && password)}
 					>
 						Sign in
 					</button>
 					<button
-						className="btn btn-primary col-span-1"
+						className="btn btn-sm btn-primary col-span-1"
 						onClick={handleSignUp}
 						disabled={!(email && password)}
 					>

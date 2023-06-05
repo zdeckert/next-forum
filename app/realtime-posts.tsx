@@ -37,9 +37,32 @@ export default function RealtimePosts({
 
 	return (
 		<>
-			{posts.map((post) => (
-				<div key={post.id}>
-					<Link href={`/${post.id}`}>{post.title}</Link>
+			{posts.map(({ id, title, content, upvotes, downvotes }) => (
+				<div
+					key={id}
+					className="card card-bordered flex flex-row border-secondary-focus gap-2 p-2 mb-4 hover:bg-secondary-content"
+				>
+					<div className="flex flex-col items-center">
+						<button className="btn btn-xs btn-square btn-ghost btn-success hover:btn-success">
+							⬆
+						</button>
+						{upvotes - downvotes}
+						<button className="btn btn-xs btn-square btn-ghost hover:btn-error">
+							⬇
+						</button>
+					</div>
+					<div className="flex flex-col ">
+						<Link
+							className="link-secondary text-xl"
+							href={`/post/${id}`}
+						>
+							{title}
+						</Link>
+
+						<p className="backdrop-blur w-full text-sm overflow-hidden text-ellipsis h-[5rem] backdrop-blur-gradient">
+							{content}
+						</p>
+					</div>
 				</div>
 			))}
 		</>
