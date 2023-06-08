@@ -1,16 +1,21 @@
 "use client";
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import {
+	Session,
+	createClientComponentClient,
+} from "@supabase/auth-helpers-nextjs";
 import { useEffect, useState } from "react";
 
+import Post from "@/components/post";
 import type { Database } from "@/lib/database.types";
-import Link from "next/link";
 type Post = Database["public"]["Tables"]["posts"]["Row"];
 
 export default function RealtimePosts({
 	serverPosts,
+	session,
 }: {
 	serverPosts: Post[];
+	session: Session | null;
 }) {
 	const [posts, setPosts] = useState(serverPosts);
 	const supabase = createClientComponentClient<Database>();
@@ -28,6 +33,20 @@ export default function RealtimePosts({
 				(payload) =>
 					setPosts((posts) => [...posts, payload.new as Post])
 			)
+			.on(
+				"postgres_changes",
+				{ event: "UPDATE", schema: "public", table: "posts" },
+				(payload) => {
+					const updatedPost = payload.new as Post;
+					setPosts((posts) => {
+						const i = posts.findIndex(
+							({ id }) => id === updatedPost.id
+						);
+						posts[i] = updatedPost;
+						return [...posts];
+					});
+				}
+			)
 			.subscribe();
 
 		return () => {
@@ -35,35 +54,32 @@ export default function RealtimePosts({
 		};
 	}, [supabase, setPosts, posts]);
 
+	const isLoggedIn: boolean = !!session;
+
+	async function handleUpvote(id: string, upvotes: number) {
+		await supabase
+			.from("posts")
+			.update({ upvotes: upvotes + 1 })
+			.eq("id", id);
+	}
+
+	async function handleDownvote(id: string, downvotes: number) {
+		await supabase
+			.from("posts")
+			.update({ downvotes: downvotes + 1 })
+			.match({ id });
+	}
+
 	return (
 		<>
-			{posts.map(({ id, title, content, upvotes, downvotes }) => (
-				<div
-					key={id}
-					className="card card-bordered flex flex-row border-secondary-focus gap-2 p-2 mb-4 hover:bg-secondary-content"
-				>
-					<div className="flex flex-col items-center">
-						<button className="btn btn-xs btn-square btn-ghost btn-success hover:btn-success">
-							⬆
-						</button>
-						{upvotes - downvotes}
-						<button className="btn btn-xs btn-square btn-ghost hover:btn-error">
-							⬇
-						</button>
-					</div>
-					<div className="flex flex-col ">
-						<Link
-							className="link-secondary text-xl"
-							href={`/post/${id}`}
-						>
-							{title}
-						</Link>
-
-						<p className="backdrop-blur w-full text-sm overflow-hidden text-ellipsis h-[5rem] backdrop-blur-gradient">
-							{content}
-						</p>
-					</div>
-				</div>
+			{posts.map((post) => (
+				<Post
+					key={post.id}
+					post={post}
+					isLoggedIn={isLoggedIn}
+					handleUpvote={handleUpvote}
+					handleDownvote={handleDownvote}
+				/>
 			))}
 		</>
 	);

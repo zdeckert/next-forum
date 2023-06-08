@@ -25,6 +25,8 @@ module.exports = {
 					primary: "#42638F",
 				},
 			},
+			// "forest",
 		],
+		// darkTheme: "forest",
 	},
 };
