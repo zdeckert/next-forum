@@ -6,7 +6,7 @@ import {
 } from "@supabase/auth-helpers-nextjs";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 import GoogleIcon from "../public/google-icon.svg";
 
@@ -51,22 +51,26 @@ export default function LoginForm({ session }: { session: Session | null }) {
 		const { data, error } = await supabase.auth.signInWithOAuth({
 			provider: "google",
 			options: {
-				redirectTo: "http://localhost:3000/auth/redirect",
+				redirectTo: "http://localhost:3000/auth/callback",
 			},
 		});
+		if (data.url) {
+			redirect(data.url);
+		}
 		console.log(`DATA: ${JSON.stringify(data)}`, `ERROR: ${error}`);
-		router.refresh();
 	}
 
 	return (
 		<>
 			{session ? (
-				<button
-					className="btn rounded-full btn-sm btn-secondary"
-					onClick={handleSignOut}
-				>
-					Log out
-				</button>
+				<form action="/auth/signout" method="post">
+					<button
+						className="btn rounded-full btn-sm btn-secondary col-span-1 "
+						type="submit"
+					>
+						Sign out
+					</button>
+				</form>
 			) : (
 				<button
 					className="btn rounded-full btn-sm btn-secondary col-span-1"
