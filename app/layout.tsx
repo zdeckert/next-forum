@@ -1,7 +1,7 @@
+import Login from "@/components/login";
 import Image from "next/image";
 import NextIcon from "../public/next-icon.ico";
 import "./globals.css";
-import Login from "./login";
 
 export const metadata = {
 	title: "Next Forum",
@@ -36,7 +36,7 @@ export default async function RootLayout({
 						<Login />
 					</div>
 				</nav>
-				<div className="grid gap-2 grid-cols-12">
+				<div className="grid gap-2 grid-cols-12 w-screen min-h-screen-nonav">
 					<div className="row-span-full col-span-full sm:col-start-2 sm:col-end-12 md:col-start-3 md:col-end-11">
 						{children}
 					</div>

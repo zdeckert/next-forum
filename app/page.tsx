@@ -4,7 +4,7 @@ import RealtimePosts from "./realtime-posts";
 
 import type { Database } from "@/lib/database.types";
 
-export default async function ServerComponent() {
+export default async function Home() {
 	const supabase = createServerComponentClient<Database>({
 		cookies,
 	});
