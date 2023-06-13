@@ -1,23 +1,20 @@
 "use client";
 
-import AuthContext from "@/components/auth/auth-context";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { redirect } from "next/navigation";
+import { ClientAuthProvider, useAuth } from "../components/auth/client-auth";
 
 export default async function RootLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
-	const supabase = createClientComponentClient();
-
-	const {
-		data: { session },
-	} = await supabase.auth.getSession();
+	const { session, supabase } = useAuth();
 
 	if (!session) {
 		redirect("/unauthorized");
 	}
 
-	return <AuthContext>{children}</AuthContext>;
+	return (
+		<ClientAuthProvider supabase={supabase}>{children}</ClientAuthProvider>
+	);
 }

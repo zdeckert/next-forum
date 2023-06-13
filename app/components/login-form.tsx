@@ -45,7 +45,7 @@ export default function LoginForm() {
 		});
 		if (data.url) {
 			console.log(data.url);
-			redirect(`${data.url}`);
+			redirect(`${data.url}/loggedin`);
 		}
 		console.log(`DATA: ${JSON.stringify(data)}`, `ERROR: ${error}`);
 	}

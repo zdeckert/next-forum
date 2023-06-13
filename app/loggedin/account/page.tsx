@@ -1,4 +1,4 @@
-import { useAuth } from "@/components/auth/auth-context";
+import { useAuth } from "@/components/auth/client-auth";
 import AccountForm from "./account-form";
 
 export default async function Account() {

@@ -1,48 +1,37 @@
 "use client";
 
-import {
-	Session,
-	createClientComponentClient,
-} from "@supabase/auth-helpers-nextjs";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-import AuthContext from "@/components/auth/auth-context";
+import { ClientAuthProvider, useAuth } from "@/components/auth/client-auth";
 import Post from "@/components/post";
 import type { Database } from "@/lib/database.types";
 type Post = Database["public"]["Tables"]["posts"]["Row"];
+
 type PostVoteHash = {
 	[key: string]: {
 		serverTotal: number;
-		id: string | undefined;
-		value: number | undefined;
+		id?: string;
+		value?: number;
 	};
 };
 
 export default function RealtimePosts({
 	serverPosts,
-	serverSession,
 	serverVotesHash,
 }: {
 	serverPosts: Post[];
-	serverSession: Session | null;
 	serverVotesHash: PostVoteHash;
 }) {
 	const [posts, setPosts] = useState(serverPosts);
-	const supabase = createClientComponentClient<Database>();
 
-	const [sessionContext, setSessionContext] = useState(serverSession || null);
-
-	useMemo(
-		() => ({ sessionContext, setSessionContext }),
-		[sessionContext, setSessionContext]
-	);
+	const { supabase } = useAuth();
 
 	useEffect(() => {
 		setPosts(serverPosts);
 	}, [serverPosts, serverVotesHash]);
 
 	useEffect(() => {
-		const channel = supabase
+		const channel = supabase!
 			.channel("*")
 			.on(
 				"postgres_changes",
@@ -67,12 +56,12 @@ export default function RealtimePosts({
 			.subscribe();
 
 		return () => {
-			supabase.removeChannel(channel);
+			supabase!.removeChannel(channel);
 		};
 	}, [supabase, setPosts, posts]);
 
 	return (
-		<AuthContext>
+		<ClientAuthProvider>
 			{posts.map((post) => (
 				<Post
 					key={post.id}
@@ -80,6 +69,6 @@ export default function RealtimePosts({
 					serverVote={serverVotesHash[post.id] || {}}
 				/>
 			))}
-		</AuthContext>
+		</ClientAuthProvider>
 	);
 }

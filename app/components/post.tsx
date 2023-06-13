@@ -2,7 +2,7 @@ import type { Database } from "@/lib/database.types";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Link from "next/link";
 import { useState } from "react";
-import { useAuth } from "./auth/auth-context";
+import { useAuth } from "./auth/client-auth";
 type Post = Database["public"]["Tables"]["posts"]["Row"];
 
 export default function Post({
@@ -12,9 +12,9 @@ export default function Post({
 }: {
 	post: Post;
 	serverVote: {
-		id: string | undefined;
+		id?: string;
 		serverTotal: number;
-		value: number | undefined;
+		value?: number;
 	};
 }) {
 	const [voteId, setVoteId] = useState(serverVoteId);

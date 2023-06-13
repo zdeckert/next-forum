@@ -1,41 +1,41 @@
+"use client";
+
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Session, SupabaseClient, User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
 
+const supabase = createClientComponentClient();
+
 const AuthContext = createContext<{
 	session: Session | null | undefined;
 	signOut: () => void;
-	supabase: SupabaseClient | null;
+	supabase: SupabaseClient;
 	user: User | null | undefined;
 }>({
 	session: null,
 	signOut: () => {},
-	supabase: null,
+	supabase,
 	user: null,
 });
 
-export default function AuthProvider({
+export function ClientAuthProvider({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
 	const [user, setUser] = useState<User>();
-	const [session, setSession] = useState<Session | null>();
+	const [session, setSession] = useState<Session | null>(null);
 	const [loading, setLoading] = useState(true);
 
-	const supabase = createClientComponentClient();
-
 	useEffect(() => {
-		const setData = async () => {
+		async function setData() {
 			const {
 				data: { session },
-				error,
 			} = await supabase.auth.getSession();
-			if (error) throw error;
 			setSession(session);
 			setUser(session?.user);
 			setLoading(false);
-		};
+		}
 
 		const { data: listener } = supabase.auth.onAuthStateChange(
 			(_event, session) => {
@@ -50,7 +50,7 @@ export default function AuthProvider({
 		return () => {
 			listener?.subscription.unsubscribe();
 		};
-	}, [setUser, supabase.auth]);
+	}, [session, setUser]);
 
 	const value = {
 		session,
