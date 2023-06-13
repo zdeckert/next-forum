@@ -19,7 +19,7 @@ export default async function Login() {
 		<div>
 			<LoginButton session={session} />
 			<LoginModal>
-				<LoginForm session={session} />
+				<LoginForm />
 			</LoginModal>
 		</div>
 	);

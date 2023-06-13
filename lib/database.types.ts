@@ -142,26 +142,20 @@ export interface Database {
         Row: {
           content: string
           created_at: string
-          downvotes: number
           id: string
           title: string
-          upvotes: number
         }
         Insert: {
           content: string
           created_at?: string
-          downvotes?: number
           id?: string
           title: string
-          upvotes?: number
         }
         Update: {
           content?: string
           created_at?: string
-          downvotes?: number
           id?: string
           title?: string
-          upvotes?: number
         }
         Relationships: []
       }
@@ -229,7 +223,19 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_avatar: {
+        Args: {
+          avatar_url: string
+        }
+        Returns: Record<string, unknown>
+      }
+      delete_storage_object: {
+        Args: {
+          bucket: string
+          object: string
+        }
+        Returns: Record<string, unknown>
+      }
     }
     Enums: {
       [_ in never]: never

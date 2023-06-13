@@ -1,16 +1,13 @@
 "use client";
 
-import {
-	Session,
-	createClientComponentClient,
-} from "@supabase/auth-helpers-nextjs";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 import GoogleIcon from "@/public/google-icon.svg";
 import Image from "next/image";
 import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function LoginForm({ session }: { session: Session | null }) {
+export default function LoginForm() {
 	const supabase = createClientComponentClient();
 
 	const [email, setEmail] = useState("");
