@@ -32,7 +32,6 @@ export default async function RootLayout({
 						</a>
 					</div>
 					<div className="navbar-end">
-						{/* @ts-expect-error next version of TS will fix this */}
 						<Login />
 					</div>
 				</nav>

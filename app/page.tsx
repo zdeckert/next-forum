@@ -16,16 +16,18 @@ export default async function Home() {
 	} = await supabase.auth.getSession();
 
 	const { data: serverPosts } = await supabase.from("posts").select("*");
+	const postIds = serverPosts?.map(({ id }) => id);
 	const { data: serverPostVotes } = await supabase
 		.from("post_votes")
-		.select("*");
+		.select("*")
+		.in("post_id", postIds!);
 
 	const postVotesHash = serverPostVotes?.reduce(
 		(acc: any, cur: PostVotes) => {
 			acc[cur.post_id] = {};
-			acc[cur.post_id].total
-				? (acc[cur.post_id].total += cur.value)
-				: (acc[cur.post_id].total = cur.value);
+			acc[cur.post_id].serverTotal
+				? (acc[cur.post_id].serverTotal += cur.value)
+				: (acc[cur.post_id].serverTotal = cur.value);
 
 			if (cur.user_id === session?.user.id) {
 				acc[cur.post_id].id = cur.id;
@@ -39,7 +41,7 @@ export default async function Home() {
 	return (
 		<>
 			<RealtimePosts
-				session={session}
+				serverSession={session}
 				serverVotesHash={postVotesHash ?? {}}
 				serverPosts={serverPosts ?? []}
 			/>

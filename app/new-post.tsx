@@ -9,7 +9,7 @@ export default function NewPost() {
 		"use server";
 		const content = String(formData.get("content"));
 		const supabase = createServerActionClient<Database>({ cookies });
-		await supabase.from("posts").insert({ content }).select();
+		// await supabase.from("posts").insert({ content }).select();
 		revalidatePath("/");
 	};
 

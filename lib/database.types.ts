@@ -17,7 +17,7 @@ export interface Database {
         }
         Insert: {
           created_at?: string
-          id: string
+          id?: string
           name: string
         }
         Update: {
@@ -38,7 +38,7 @@ export interface Database {
         Insert: {
           comment_id: string
           created_at?: string
-          id: string
+          id?: string
           user_id: string
           value: number
         }
@@ -74,7 +74,7 @@ export interface Database {
         }
         Insert: {
           created_at?: string
-          id: string
+          id?: string
           post_id: string
           text: string
           user_id: string
@@ -111,7 +111,7 @@ export interface Database {
         }
         Insert: {
           created_at?: string
-          id: string
+          id?: string
           post_id: string
           user_id: string
           value: number
@@ -163,21 +163,21 @@ export interface Database {
         Row: {
           avatar_url: string | null
           id: string
-          updated_at: string | null
+          updated_at: string
           username: string
           website: string | null
         }
         Insert: {
           avatar_url?: string | null
-          id: string
-          updated_at?: string | null
+          id?: string
+          updated_at?: string
           username: string
           website?: string | null
         }
         Update: {
           avatar_url?: string | null
           id?: string
-          updated_at?: string | null
+          updated_at?: string
           username?: string
           website?: string | null
         }
