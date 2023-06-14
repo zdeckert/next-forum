@@ -18,11 +18,7 @@ const AuthContext = createContext<{
 	user: null,
 });
 
-export function ClientAuthProvider({
-	children,
-}: {
-	children: React.ReactNode;
-}) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const [user, setUser] = useState<User>();
 	const [session, setSession] = useState<Session | null>(null);
 	const [loading, setLoading] = useState(true);

@@ -17,6 +17,8 @@ module.exports = {
 	plugins: [require("daisyui")],
 	daisyui: {
 		themes: [
+			"black",
+			"forest",
 			{
 				garden: {
 					...require("daisyui/src/theming/themes")[
@@ -25,8 +27,8 @@ module.exports = {
 					primary: "#42638F",
 				},
 			},
-			// "forest",
+			"lofi",
+			"wireframe",
 		],
-		// darkTheme: "forest",
 	},
 };

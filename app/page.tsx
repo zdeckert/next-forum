@@ -1,3 +1,4 @@
+import { ChannelHash, PostVoteHash } from "@/lib/consts.types";
 import RealtimePosts from "./realtime-posts";
 
 import type { Database } from "@/lib/database.types";
@@ -22,14 +23,7 @@ export default async function Home() {
 		.select("*")
 		.in("post_id", postIds!);
 
-	type VoteHashT = {
-		[key: string]: {
-			id?: string;
-			serverTotal: number;
-			value?: number;
-		};
-	};
-	const postVotesHash: VoteHashT = serverPostVotes!.reduce((acc, cur) => {
+	const postVotesHash: PostVoteHash = serverPostVotes!.reduce((acc, cur) => {
 		acc[cur.post_id] = { serverTotal: 0 };
 		acc[cur.post_id].serverTotal += cur.value;
 
@@ -40,11 +34,18 @@ export default async function Home() {
 		return acc;
 	}, {});
 
+	const { data: channels } = await supabase!.from("channels").select("*");
+	const channelHash: ChannelHash = channels!.reduce(
+		(acc, cur) => ({ ...acc, [cur.id]: cur.name }),
+		{}
+	);
+
 	return (
 		<>
 			<RealtimePosts
 				serverVotesHash={postVotesHash ?? {}}
 				serverPosts={(serverPosts as Post[]) ?? []}
+				channelHash={channelHash ?? {}}
 			/>
 
 			<div className="collapse bg-base-200">

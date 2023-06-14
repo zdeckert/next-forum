@@ -8,13 +8,11 @@ export default async function RootLayout({
 }: {
 	children: React.ReactNode;
 }) {
-	const { session, supabase } = useAuth();
+	const { session } = useAuth();
 
 	if (!session) {
 		redirect("/unauthorized");
 	}
 
-	return (
-		<ClientAuthProvider supabase={supabase}>{children}</ClientAuthProvider>
-	);
+	return <ClientAuthProvider>{children}</ClientAuthProvider>;
 }

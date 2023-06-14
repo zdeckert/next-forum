@@ -12,16 +12,19 @@ export interface Database {
       channels: {
         Row: {
           created_at: string
+          description: string | null
           id: string
           name: string
         }
         Insert: {
           created_at?: string
+          description?: string | null
           id?: string
           name: string
         }
         Update: {
           created_at?: string
+          description?: string | null
           id?: string
           name?: string
         }
@@ -140,24 +143,34 @@ export interface Database {
       }
       posts: {
         Row: {
+          channel_id: string
           content: string
           created_at: string
           id: string
           title: string
         }
         Insert: {
+          channel_id: string
           content: string
           created_at?: string
           id?: string
           title: string
         }
         Update: {
+          channel_id?: string
           content?: string
           created_at?: string
           id?: string
           title?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "posts_channel_id_fkey"
+            columns: ["channel_id"]
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       profiles: {
         Row: {
@@ -213,6 +226,40 @@ export interface Database {
           {
             foreignKeyName: "roles_profile_id_fkey"
             columns: ["profile_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      subscriptions: {
+        Row: {
+          channel_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_channel_id_fkey"
+            columns: ["channel_id"]
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_user_id_fkey"
+            columns: ["user_id"]
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           }

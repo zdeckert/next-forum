@@ -1,7 +1,7 @@
 "use server";
 
-import LoginButton from "@/components/login-button";
-import LoginForm from "@/components/login-form";
+import LoginButton from "@/components/login/login-button";
+import LoginForm from "@/components/login/login-form";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 

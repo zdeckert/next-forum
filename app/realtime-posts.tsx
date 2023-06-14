@@ -2,25 +2,22 @@
 
 import { useEffect, useState } from "react";
 
-import { ClientAuthProvider, useAuth } from "@/components/auth/client-auth";
+import { AuthProvider, useAuth } from "@/components/auth";
 import Post from "@/components/post";
+import { PostVoteHash } from "@/lib/consts.types";
 import type { Database } from "@/lib/database.types";
 type Post = Database["public"]["Tables"]["posts"]["Row"];
-
-type PostVoteHash = {
-	[key: string]: {
-		serverTotal: number;
-		id?: string;
-		value?: number;
-	};
-};
 
 export default function RealtimePosts({
 	serverPosts,
 	serverVotesHash,
+	channelHash,
 }: {
 	serverPosts: Post[];
 	serverVotesHash: PostVoteHash;
+	channelHash: {
+		[key: string]: string;
+	};
 }) {
 	const [posts, setPosts] = useState(serverPosts);
 
@@ -28,7 +25,7 @@ export default function RealtimePosts({
 
 	useEffect(() => {
 		setPosts(serverPosts);
-	}, [serverPosts, serverVotesHash]);
+	}, [serverPosts]);
 
 	useEffect(() => {
 		const channel = supabase!
@@ -61,7 +58,7 @@ export default function RealtimePosts({
 	}, [supabase, setPosts, posts]);
 
 	return (
-		<ClientAuthProvider>
+		<AuthProvider>
 			{posts.map((post) => (
 				<Post
 					key={post.id}
@@ -69,6 +66,6 @@ export default function RealtimePosts({
 					serverVote={serverVotesHash[post.id] || {}}
 				/>
 			))}
-		</ClientAuthProvider>
+		</AuthProvider>
 	);
 }

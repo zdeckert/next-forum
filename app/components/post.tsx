@@ -1,14 +1,17 @@
 import type { Database } from "@/lib/database.types";
+import ArrowDown from "@/public/arrow-down.svg";
+import ArrowUp from "@/public/arrow-up.svg";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useAuth } from "./auth/client-auth";
+import { useAuth } from "./auth";
 type Post = Database["public"]["Tables"]["posts"]["Row"];
 
 export default function Post({
 	post: { content, id: postId, title },
-
 	serverVote: { id: serverVoteId, serverTotal, value },
+	channelName,
 }: {
 	post: Post;
 	serverVote: {
@@ -16,6 +19,7 @@ export default function Post({
 		serverTotal: number;
 		value?: number;
 	};
+	channelName: string;
 }) {
 	const [voteId, setVoteId] = useState(serverVoteId);
 	const [vote, setVote] = useState(value);
@@ -66,42 +70,38 @@ export default function Post({
 	return (
 		<div
 			key={postId}
-			className="card card-bordered flex flex-row border-secondary-focus gap-2 p-2 mb-4 hover:bg-secondary-content"
+			className="border-[1px] flex flex-row border-secondary-focus gap-2 p-2 mb-4 hover:bg-base-200"
 		>
 			<div className="flex flex-col items-center">
 				<form action={() => HandleVote(1)}>
 					<button
-						className={`btn btn-xs btn-square ${
-							vote === 1 ? "btn-success" : "btn-ghost"
+						className={`btn btn-xs btn-circle ${
+							vote === 1 ? "btn-success" : ""
 						} hover:btn-success`}
 					>
-						🔼
+						<Image src={ArrowUp} alt="upvote icon" />
 					</button>
 				</form>
 				{total >= 0 ? total : 0}
 				<form action={() => HandleVote(-1)}>
 					<button
-						className={`btn btn-xs btn-square ${
-							vote === -1 ? "btn-error" : "btn-ghost"
-						} hover:btn-error`}
+						className={`btn btn-xs btn-circle hover:btn-error stroke-primary-content ${
+							vote === -1 ? "btn-error" : "btn-secondary"
+						} `}
 					>
-						🔽
+						<Image src={ArrowDown} alt="downvote icon" />
 					</button>
 				</form>
 			</div>
-
-			<div className="flex flex-col ">
-				<Link
-					className="link-secondary text-xl"
-					href={`/post/${postId}`}
-				>
+			<Link className="link-secondary text-xl" href={`/post/${postId}`}>
+				<div className="flex flex-col ">
 					{title}
-				</Link>
 
-				<p className="backdrop-blur w-full text-sm overflow-hidden text-ellipsis h-[5rem] backdrop-blur-gradient">
-					{content}
-				</p>
-			</div>
+					<p className="backdrop-blur w-full text-sm overflow-hidden text-ellipsis h-[5rem] backdrop-blur-gradient">
+						{content}
+					</p>
+				</div>
+			</Link>
 		</div>
 	);
 }
