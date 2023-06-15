@@ -1,28 +1,23 @@
-import type { Database } from "@/lib/database.types";
-import ArrowDown from "@/public/arrow-down.svg";
-import ArrowUp from "@/public/arrow-up.svg";
+import { ServerPost } from "@/lib/consts.types";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from "./auth";
-type Post = Database["public"]["Tables"]["posts"]["Row"];
 
 export default function Post({
-	post: { content, id: postId, title },
-	serverVote: { id: serverVoteId, serverTotal, value },
-	channelName,
+	post: {
+		channels: { name: channelName },
+		content,
+		id: postId,
+		post_votes: { total: serverTotal, userVote, voteId: serverVoteId },
+		profiles: { username },
+		title,
+	},
 }: {
-	post: Post;
-	serverVote: {
-		id?: string;
-		serverTotal: number;
-		value?: number;
-	};
-	channelName: string;
+	post: ServerPost;
 }) {
 	const [voteId, setVoteId] = useState(serverVoteId);
-	const [vote, setVote] = useState(value);
+	const [vote, setVote] = useState(userVote || undefined);
 	const [total, setTotal] = useState(serverTotal);
 	const supabase = createClientComponentClient();
 
@@ -70,34 +65,59 @@ export default function Post({
 	return (
 		<div
 			key={postId}
-			className="border-[1px] flex flex-row border-secondary-focus gap-2 p-2 mb-4 hover:bg-base-200"
+			className="border-2 flex flex-row border-base-content gap-2 p-2 mb-4 hover:bg-base-200"
 		>
 			<div className="flex flex-col items-center">
-				<form action={() => HandleVote(1)}>
-					<button
-						className={`btn btn-xs btn-circle ${
-							vote === 1 ? "btn-success" : ""
-						} hover:btn-success`}
+				<button
+					onClick={() => HandleVote(1)}
+					className={`btn btn-xs btn-circle ${
+						vote === 1 ? "btn-success" : ""
+					} hover:btn-success`}
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						strokeWidth="1.5"
+						stroke="currentColor"
 					>
-						<Image src={ArrowUp} alt="upvote icon" />
-					</button>
-				</form>
-				{total >= 0 ? total : 0}
-				<form action={() => HandleVote(-1)}>
-					<button
-						className={`btn btn-xs btn-circle hover:btn-error stroke-primary-content ${
-							vote === -1 ? "btn-error" : "btn-secondary"
-						} `}
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							d="M15 11.25l-3-3m0 0l-3 3m3-3v7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+						/>
+					</svg>
+				</button>
+				<div>{total >= 0 ? total : 0}</div>
+				<button
+					onClick={() => HandleVote(-1)}
+					className={`btn btn-xs btn-circle hover:btn-error stroke-primary-content ${
+						vote === -1 ? "btn-error" : ""
+					} `}
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						strokeWidth="1.5"
+						stroke="currentColor"
 					>
-						<Image src={ArrowDown} alt="downvote icon" />
-					</button>
-				</form>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M9 12.75l3 3m0 0l3-3m-3 3v-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+						/>
+					</svg>
+				</button>
 			</div>
-			<Link className="link-secondary text-xl" href={`/post/${postId}`}>
-				<div className="flex flex-col ">
-					{title}
+			<Link href={`/post/${postId}`}>
+				<div className="flex flex-col no-underline gap-2">
+					<p>
+						Posted in {channelName}. Author: {username}
+					</p>
+					<p className="text-xl leading-5 link link-hover">{title}</p>
 
-					<p className="backdrop-blur w-full text-sm overflow-hidden text-ellipsis h-[5rem] backdrop-blur-gradient">
+					<p className="backdrop-blur w-full text-sm overflow-hidden text-ellipsis h-[5rem] mask-linear">
 						{content}
 					</p>
 				</div>

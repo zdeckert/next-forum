@@ -4,20 +4,15 @@ import { useEffect, useState } from "react";
 
 import { AuthProvider, useAuth } from "@/components/auth";
 import Post from "@/components/post";
-import { PostVoteHash } from "@/lib/consts.types";
-import type { Database } from "@/lib/database.types";
+import { ServerPost } from "@/lib/consts.types";
+import { Database } from "@/lib/database.types";
+
 type Post = Database["public"]["Tables"]["posts"]["Row"];
 
 export default function RealtimePosts({
 	serverPosts,
-	serverVotesHash,
-	channelHash,
 }: {
-	serverPosts: Post[];
-	serverVotesHash: PostVoteHash;
-	channelHash: {
-		[key: string]: string;
-	};
+	serverPosts: ServerPost[];
 }) {
 	const [posts, setPosts] = useState(serverPosts);
 
@@ -60,11 +55,7 @@ export default function RealtimePosts({
 	return (
 		<AuthProvider>
 			{posts.map((post) => (
-				<Post
-					key={post.id}
-					post={post}
-					serverVote={serverVotesHash[post.id] || {}}
-				/>
+				<Post key={post.id} post={post} />
 			))}
 		</AuthProvider>
 	);

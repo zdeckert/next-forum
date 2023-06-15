@@ -3,11 +3,15 @@
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useEffect, useState } from "react";
 
+import Post from "@/app/components/post";
+import { ServerPost } from "@/lib/consts.types";
 import type { Database } from "@/lib/database.types";
 
-type Post = Database["public"]["Tables"]["posts"]["Row"];
-
-export default function RealtimePost({ serverPost }: { serverPost: Post }) {
+export default function RealtimePost({
+	serverPost,
+}: {
+	serverPost: ServerPost;
+}) {
 	const supabase = createClientComponentClient<Database>();
 	const [post, setPost] = useState(serverPost);
 
@@ -37,5 +41,5 @@ export default function RealtimePost({ serverPost }: { serverPost: Post }) {
 		};
 	}, [supabase, post, setPost]);
 
-	return <pre>{JSON.stringify(post, null, 2)}</pre>;
+	return <Post post={post} />;
 }

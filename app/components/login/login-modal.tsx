@@ -1,11 +1,11 @@
 export default function LoginModal({
-	children,
+  children,
 }: {
-	children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-	return (
-		<dialog id="login_modal" className="modal ">
-			{children}
-		</dialog>
-	);
+  return (
+    <dialog id="login_modal" className="modal ">
+      {children}
+    </dialog>
+  );
 }

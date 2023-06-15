@@ -123,7 +123,7 @@ export default function AccountForm({ session }: { session: Session }) {
 
 				<div>
 					<button
-						className="btn btn-secondary rounded-full"
+						className="btn btn-secondary"
 						onClick={() =>
 							updateProfile({
 								username,

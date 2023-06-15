@@ -59,7 +59,7 @@ export default function LoginForm() {
 				<div className="col-span-2 h-12" />
 				<div className="col-span-2 flex justify-center">
 					<button
-						className="btn rounded-full btn-nuetral w-1/2"
+						className="btn btn-nuetral w-1/2"
 						onClick={signInWithGoogle}
 					>
 						<Image
@@ -74,7 +74,7 @@ export default function LoginForm() {
 				<button
 					/* @ts-expect-error */
 					onClick={() => window.login_modal.close()}
-					className="btn rounded-full btn-sm btn-circle btn-ghost absolute right-2 top-2"
+					className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
 				>
 					✕
 				</button>
@@ -99,14 +99,14 @@ export default function LoginForm() {
 				/>
 
 				<button
-					className="btn rounded-full btn-sm btn-secondary col-span-1"
+					className="btn btn-sm btn-secondary col-span-1"
 					onClick={handleSignIn}
 					disabled={!(email && password)}
 				>
 					Sign in
 				</button>
 				<button
-					className="btn rounded-full btn-sm btn-primary col-span-1"
+					className="btn btn-sm btn-primary col-span-1"
 					onClick={handleSignUp}
 					disabled={!(email && password)}
 				>

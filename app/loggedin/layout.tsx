@@ -1,7 +1,7 @@
 "use client";
 
+import { AuthProvider, useAuth } from "@/components/auth";
 import { redirect } from "next/navigation";
-import { ClientAuthProvider, useAuth } from "../components/auth/client-auth";
 
 export default async function RootLayout({
 	children,
@@ -14,5 +14,5 @@ export default async function RootLayout({
 		redirect("/unauthorized");
 	}
 
-	return <ClientAuthProvider>{children}</ClientAuthProvider>;
+	return <AuthProvider>{children}</AuthProvider>;
 }

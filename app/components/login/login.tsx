@@ -9,18 +9,18 @@ import type { Database } from "@/lib/database.types";
 import LoginModal from "./login-modal";
 
 export default async function Login() {
-	const supabase = createServerComponentClient<Database>({ cookies });
+  const supabase = createServerComponentClient<Database>({ cookies });
 
-	const {
-		data: { session },
-	} = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
-	return (
-		<div>
-			<LoginButton session={session} />
-			<LoginModal>
-				<LoginForm />
-			</LoginModal>
-		</div>
-	);
+  return (
+    <div>
+      <LoginButton session={session} />
+      <LoginModal>
+        <LoginForm />
+      </LoginModal>
+    </div>
+  );
 }
