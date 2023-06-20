@@ -2,27 +2,18 @@ import type { Database } from "@/lib/database.types";
 
 type Post = Database["public"]["Tables"]["posts"]["Row"];
 
-export type PostVoteHash = {
-	[key: string]: {
-		serverTotal: number;
-		id?: string;
-		value?: number;
-	};
-};
-
-export type ChannelHash = {
-	[key: string]: string;
-};
-
-export interface ServerPost extends Post {
+export interface PostWithJoins extends Post {
 	channels: {
 		name: string;
+		slug: string;
 	};
-	post_votes: {
-		total: number;
-		userVote: number;
-		voteId: string;
-	};
+	post_votes: [
+		{
+			id: string;
+			value: number;
+			user_id: string;
+		}
+	];
 	profiles: {
 		username: string;
 	};

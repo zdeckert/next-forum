@@ -1,4 +1,4 @@
-import { ServerPost } from "@/lib/consts.types";
+import { PostWithJoins } from "@/lib/consts.types";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import Link from "next/link";
 import { useState } from "react";
@@ -6,22 +6,31 @@ import { useAuth } from "./auth";
 
 export default function Post({
 	post: {
-		channels: { name: channelName },
+		channels: { name: channelName, slug: channelSlug },
 		content,
 		id: postId,
-		post_votes: { total: serverTotal, userVote, voteId: serverVoteId },
+		post_votes,
+		// : { total: serverTotal, userVote, voteId: serverVoteId },
 		profiles: { username },
 		title,
 	},
+	compact = true,
 }: {
-	post: ServerPost;
+	post: PostWithJoins;
+	compact?: boolean;
 }) {
+	const { session } = useAuth();
+
+	/* @ts-expect-error server, values can be undefined*/
+	const { id: serverVoteId, value: userVote } = post_votes.find(
+		({ user_id }) => user_id === session?.user.id
+	);
+	const serverTotal = post_votes.reduce((acc, { value }) => acc + value, 0);
 	const [voteId, setVoteId] = useState(serverVoteId);
 	const [vote, setVote] = useState(userVote || undefined);
 	const [total, setTotal] = useState(serverTotal);
 	const supabase = createClientComponentClient();
 
-	const { session } = useAuth();
 	async function HandleVote(inputValue: number) {
 		// if no session, show pop up
 		if (!session) {
@@ -103,25 +112,37 @@ export default function Post({
 						stroke="currentColor"
 					>
 						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
+							strokeLinecap="round"
+							strokeLinejoin="round"
 							d="M9 12.75l3 3m0 0l3-3m-3 3v-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
 						/>
 					</svg>
 				</button>
 			</div>
-			<Link href={`/post/${postId}`}>
-				<div className="flex flex-col no-underline gap-2">
-					<p>
-						Posted in {channelName}. Author: {username}
-					</p>
-					<p className="text-xl leading-5 link link-hover">{title}</p>
 
-					<p className="backdrop-blur w-full text-sm overflow-hidden text-ellipsis h-[5rem] mask-linear">
-						{content}
-					</p>
-				</div>
-			</Link>
+			<div className="flex flex-col no-underline gap-2">
+				<p>
+					Posted in{" "}
+					<Link
+						href={`/c/${channelSlug}`}
+						className="link link-hover"
+					>
+						{channelName}.
+					</Link>
+					. Author: {username}
+				</p>
+				<Link href={`/c/${channelSlug}/post/${postId}`}>
+					<p className="text-xl leading-5 link link-hover">{title}</p>
+				</Link>
+
+				<p
+					className={`w-full text-sm overflow-hidden text-ellipsis h-[5rem] ${
+						compact ? "backdrop-blur mask-linear" : ""
+					}`}
+				>
+					{content}
+				</p>
+			</div>
 		</div>
 	);
 }
