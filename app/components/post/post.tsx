@@ -27,10 +27,10 @@ export default function Post({
 	const votes = { total, voteId, userVote };
 
 	return (
-		<div className="border-2 flex flex-row border-base-content gap-2 p-2 mb-4">
+		<div className="border-2 flex border-base-content gap-2 p-2 mb-4">
 			<Votes votes={votes} postId={postId} />
 
-			<div className="flex flex-col no-underline gap-2">
+			<div className="flex flex-col gap-2">
 				<p>
 					Posted in{" "}
 					<Link
@@ -46,12 +46,9 @@ export default function Post({
 					<p className="text-xl leading-5 link link-hover">{title}</p>
 				</Link>
 
-				<p className="w-full text-sm overflow-hidden text-ellipsis h-[5rem]">
-					{content}
-				</p>
+				<p className="w-full text-sm">{content}</p>
+				<Comments postId={postId} />
 			</div>
-
-			<Comments postId={postId} />
 		</div>
 	);
 }

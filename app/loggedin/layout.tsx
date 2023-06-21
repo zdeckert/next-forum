@@ -3,7 +3,7 @@
 import { AuthProvider, useAuth } from "@/components/auth";
 import { redirect } from "next/navigation";
 
-export default async function RootLayout({
+export default async function LoggedInLayout({
 	children,
 }: {
 	children: React.ReactNode;

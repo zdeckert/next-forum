@@ -1,26 +1,30 @@
 "use client";
 
-import DataCollapse from "@/app/components/testing/collapse";
-import { useAuth } from "@/components/auth";
+import CompactPost from "@/app/components/post/compact-post";
+import LoadingPost from "@/app/components/post/loading-post";
 import { PostWithJoins } from "@/lib/consts.types";
-import { useEffect, useState } from "react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { Suspense } from "react";
 
 export default function Channel({
 	params: { slug },
 }: {
 	params: { slug: string };
 }) {
-	const [posts, setPosts]: [null | PostWithJoins[], Function] =
-		useState(null);
+	return (
+		<Suspense fallback={<LoadingPost />}>
+			<GetChannelPosts slug={slug} />
+		</Suspense>
+	);
+}
 
-	const { supabase } = useAuth();
-
-	useEffect(() => {
-		async function setData() {
-			const { data } = await supabase!
-				.from("posts")
-				.select(
-					`*, 
+async function GetChannelPosts({ slug }: { slug: string }) {
+	const supabase = createClientComponentClient();
+	/* @ts-expect-error */
+	const { data: posts }: { data: PostWithJoins[] | null } = await supabase
+		.from("posts")
+		.select(
+			`*, 
                 channels (
                     name,
                     slug
@@ -33,18 +37,13 @@ export default function Channel({
                     value,
                     user_id
                 )`
-				)
-				.eq("channels.slug", slug);
-			setPosts(data);
-		}
-
-		setData();
-	}, [supabase, slug]);
-
+		)
+		.eq("channels.slug", slug);
 	return (
 		<>
-			<DataCollapse data={posts} />
-			<DataCollapse data={slug} />
+			{posts!.map((post) => (
+				<CompactPost key={post.id} post={post} />
+			))}
 		</>
 	);
 }
