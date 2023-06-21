@@ -1,68 +1,65 @@
 "use client";
 
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { Session, SupabaseClient, User } from "@supabase/supabase-js";
+import { Session, User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
 
-const supabase = createClientComponentClient();
-
 const AuthContext = createContext<{
-  session: Session | null | undefined;
-  signOut: () => void;
-  supabase: SupabaseClient;
-  user: User | null | undefined;
+	session: Session | null | undefined;
+	signOut: () => void;
+	user: User | null | undefined;
 }>({
-  session: null,
-  signOut: () => {},
-  supabase,
-  user: null,
+	session: null,
+	signOut: () => {},
+	user: null,
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User>();
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+	const [user, setUser] = useState<User>();
+	const [session, setSession] = useState<Session | null>(null);
+	const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function setData() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user);
-      setLoading(false);
-    }
+	const supabase = createClientComponentClient();
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        setUser(session?.user);
-        setLoading(false);
-      }
-    );
+	useEffect(() => {
+		async function setData() {
+			const {
+				data: { session },
+			} = await supabase.auth.getSession();
+			setSession(session);
+			setUser(session?.user);
+			setLoading(false);
+		}
 
-    setData();
+		const { data: listener } = supabase.auth.onAuthStateChange(
+			(_event, session) => {
+				setSession(session);
+				setUser(session?.user);
+				setLoading(false);
+			}
+		);
 
-    return () => {
-      listener?.subscription.unsubscribe();
-    };
-  }, [session, setUser]);
+		setData();
 
-  const value = {
-    session,
-    signOut: () => supabase.auth.signOut(),
-    supabase,
-    user,
-  };
+		return () => {
+			listener?.subscription.unsubscribe();
+		};
+	}, [session, setUser]);
 
-  // use a provider to pass down the value
-  return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
-    </AuthContext.Provider>
-  );
+	const value = {
+		session,
+		signOut: () => supabase.auth.signOut(),
+		user,
+	};
+
+	// use a provider to pass down the value
+	return (
+		<AuthContext.Provider value={value}>
+			{!loading && children}
+		</AuthContext.Provider>
+	);
 }
 
 export function useAuth() {
-  return useContext(AuthContext);
+	return useContext(AuthContext);
 }

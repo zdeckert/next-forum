@@ -2,15 +2,12 @@ import { PostWithJoins } from "@/lib/consts.types";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import DataCollapse from "./components/testing/collapse";
-import Posts from "./posts";
+import Feed from "./feed";
 
 export default async function Home() {
 	const supabase = createServerComponentClient({
 		cookies,
 	});
-	const {
-		data: { session },
-	} = await supabase.auth.getSession();
 
 	const { data: posts } = await supabase!.from("posts").select(`*,
 	channels (
@@ -28,7 +25,7 @@ export default async function Home() {
 
 	return (
 		<>
-			<Posts posts={posts as PostWithJoins[]} />
+			<Feed posts={posts as PostWithJoins[]} />
 			<DataCollapse data={posts} />
 		</>
 	);

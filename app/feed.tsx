@@ -1,14 +1,14 @@
 "use client";
 
 import { AuthProvider } from "@/components/auth";
-import Post from "@/components/post";
+import CompactPost from "@/components/post/compact-post";
 import { PostWithJoins } from "@/lib/consts.types";
 
-export default function Posts({ posts }: { posts: PostWithJoins[] }) {
+export default function Feed({ posts }: { posts: PostWithJoins[] }) {
 	return (
 		<AuthProvider>
 			{posts.map((post) => (
-				<Post key={post.id} post={post} />
+				<CompactPost key={post.id} post={post} />
 			))}
 		</AuthProvider>
 	);

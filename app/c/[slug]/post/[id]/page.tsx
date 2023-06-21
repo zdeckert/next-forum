@@ -1,8 +1,9 @@
 "use client";
 
 import { useAuth } from "@/app/components/auth";
-import Post from "@/app/components/post";
-import { PostWithJoin } from "@/lib/consts.types";
+import Post from "@/app/components/post/post";
+import { PostWithJoins } from "@/lib/consts.types";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useEffect, useState } from "react";
 
 export default function SinglePost({
@@ -10,10 +11,12 @@ export default function SinglePost({
 }: {
 	params: { id: string };
 }) {
-	const [post, setPost]: [PostWithJoin | undefined, Function] = useState();
+	const [post, setPost] = useState<PostWithJoins>();
 	const [loading, setLoading] = useState(true);
 
-	const { session, supabase } = useAuth();
+	const supabase = createClientComponentClient();
+
+	const { session } = useAuth();
 
 	useEffect(() => {
 		async function setData() {
@@ -37,7 +40,7 @@ export default function SinglePost({
 				.match({ id })
 				.single();
 
-			setPost(post);
+			setPost(post as PostWithJoins);
 			setLoading(false);
 		}
 
@@ -48,5 +51,5 @@ export default function SinglePost({
 	// 	notFound
 	// }
 
-	return loading ? <p>...</p> : <Post post={post} />;
+	return loading ? <p>...</p> : <Post post={post as PostWithJoins} />;
 }
