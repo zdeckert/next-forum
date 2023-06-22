@@ -1,19 +1,30 @@
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
-import { Database } from "@/lib/database.types";
+import { useRouter } from "next/navigation";
 import { FormEvent, Suspense, useState } from "react";
 import { useAuth } from "../auth";
-import DataCollapse from "../testing/collapse";
-
-type Comment = Database["public"]["Tables"]["comments"]["Row"];
 
 export default function Comments({ postId }: { postId: string }) {
-	const [submitLoading, setSubmitLoading] = useState<boolean>(false);
+	return (
+		<div className="w-full">
+			<p className="text-xl">Comments</p>
 
+			<NewComment postId={postId} />
+
+			<Suspense fallback={<p>Loading Comments</p>}>
+				<GetCommentsFeed />
+			</Suspense>
+		</div>
+	);
+}
+
+function NewComment({ postId }: { postId: string }) {
+	const [submitLoading, setSubmitLoading] = useState<boolean>(false);
 	const [commentInput, setCommentInput] = useState<string>();
 
 	const { session, profile } = useAuth();
 	const supabase = createClientComponentClient();
+	const router = useRouter();
 
 	async function addComment(e: FormEvent) {
 		e.preventDefault();
@@ -32,46 +43,33 @@ export default function Comments({ postId }: { postId: string }) {
 		});
 		setSubmitLoading(false);
 		setCommentInput("");
+		router.refresh();
 	}
 
-	return (
-		<div className="w-full">
-			<p className="text-xl">Comments</p>
-			<>
-				{session ? (
-					<>
-						<p>Comment as {profile?.username}</p>
-						<form onSubmit={(e) => addComment(e)}>
-							<textarea
-								className="textarea w-full h-4 textarea-bordered"
-								onChange={(e) =>
-									setCommentInput(
-										(e.target as HTMLTextAreaElement).value
-									)
-								}
-								value={commentInput}
-							/>
-							<button
-								className="btn btn-primary btn-xs"
-								type="submit"
-								disabled={submitLoading}
-							>
-								Comment
-							</button>
-						</form>
-					</>
-				) : (
-					<></>
-				)}
-			</>
-			<Suspense fallback={<p>Loading Comments</p>}>
-				<CommentsFeed />
-			</Suspense>
-		</div>
-	);
+	return session ? (
+		<>
+			<p>Comment as {profile?.username}</p>
+			<form onSubmit={(e) => addComment(e)}>
+				<textarea
+					className="textarea w-full h-4 textarea-bordered"
+					onChange={(e) =>
+						setCommentInput((e.target as HTMLTextAreaElement).value)
+					}
+					value={commentInput}
+				/>
+				<button
+					className="btn btn-primary btn-xs"
+					type="submit"
+					disabled={submitLoading}
+				>
+					Comment
+				</button>
+			</form>
+		</>
+	) : null;
 }
 
-async function CommentsFeed() {
+async function GetCommentsFeed() {
 	const supabase = createClientComponentClient();
 	const { data: comments } =
 		(await supabase.from("comments").select(
@@ -84,14 +82,12 @@ async function CommentsFeed() {
 			)`
 		)) || [];
 
-	console.log(comments);
-
 	return (
 		<>
 			{comments!.map((comment) => (
 				<>
-					<DataCollapse data={comment} />
-					<p>{comment.text}</p>;<p>{comment.profiles.username}</p>
+					<p>{comment.text}</p>
+					<p>{comment.profiles.username}</p>
 				</>
 			))}
 		</>
