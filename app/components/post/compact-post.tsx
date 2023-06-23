@@ -1,7 +1,7 @@
 import { PostWithJoins } from "@/lib/consts.types";
 import Link from "next/link";
 import { useAuth } from "../auth";
-import Votes from "./votes";
+import Votes from "./comment-votes";
 
 export default function CompactPost({
 	post: {

@@ -1,26 +1,37 @@
 import { useAuth } from "@/components/auth";
+import { Database } from "@/lib/database.types";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useState } from "react";
 
-export default function Votes({
-	votes: { total: intialTotal, userVote, voteId: intialVoteId },
+type PostVotes = Database["public"]["Tables"]["post_votes"]["Row"];
+
+export default function CommentVotes({
+	postVotes,
 	postId,
 }: {
-	votes: {
-		total: number;
-		userVote?: number;
-		voteId?: string;
-	};
+	postVotes: {
+		id: string;
+		value: number;
+		user_id: string;
+	}[];
 	postId: string;
 }) {
-	const [voteId, setVoteId] = useState(intialVoteId);
-	const [vote, setVote] = useState(userVote || undefined);
-	const [total, setTotal] = useState(intialTotal);
-
 	const { session } = useAuth();
 	const supabase = createClientComponentClient();
 
-	async function HandleVote(inputValue: number) {
+	const { id: intialVoteId, value: initialVoteValue } = postVotes.find(
+		({ user_id }) => user_id === session?.user.id
+	) || { id: undefined, value: undefined };
+
+	const intialTotal = postVotes.reduce((acc, { value }) => acc + value, 0);
+
+	const [voteValue, setVoteValue] = useState<number | undefined>(
+		initialVoteValue
+	);
+	const [voteId, setvoteId] = useState<string | undefined>(intialVoteId);
+	const [total, setTotal] = useState<number>(intialTotal);
+
+	async function HandleVote(inputValue: 1 | -1) {
 		// if no session, show pop up
 		if (!session) {
 			/* @ts-expect-error */
@@ -29,13 +40,13 @@ export default function Votes({
 		}
 
 		// if session with vote, pressing same button, remove vote
-		if (vote === inputValue) {
+		if (voteValue === inputValue) {
 			await supabase.from("post_votes").delete().eq("id", voteId);
 			setTotal(total - inputValue);
 		}
 
 		// if session with vote, update existing vote
-		if (vote && vote !== inputValue) {
+		if (voteValue && voteValue !== inputValue) {
 			await supabase
 				.from("post_votes")
 				.update({ value: inputValue })
@@ -45,7 +56,7 @@ export default function Votes({
 
 		// if session with no vote, insert new vote
 		// save new vote id for further update, deletes, etc
-		if (vote === undefined) {
+		if (voteValue === undefined) {
 			const { data, error } = await supabase
 				.from("post_votes")
 				.insert({
@@ -55,10 +66,12 @@ export default function Votes({
 				})
 				.select();
 
-			setVoteId(data![0].id);
+			setvoteId(data![0].id);
 			setTotal(total + inputValue);
 		}
-		vote === inputValue ? setVote(undefined) : setVote(inputValue);
+		voteValue === inputValue
+			? setVoteValue(undefined)
+			: setVoteValue(inputValue);
 	}
 
 	return (
@@ -66,7 +79,7 @@ export default function Votes({
 			<button
 				onClick={() => HandleVote(1)}
 				className={`btn btn-xs btn-circle ${
-					vote === 1 ? "btn-success" : ""
+					voteValue === 1 ? "btn-success" : ""
 				} hover:btn-success`}
 			>
 				<svg
@@ -87,7 +100,7 @@ export default function Votes({
 			<button
 				onClick={() => HandleVote(-1)}
 				className={`btn btn-xs btn-circle hover:btn-error stroke-primary-content ${
-					vote === -1 ? "btn-error" : ""
+					voteValue === -1 ? "btn-error" : ""
 				} `}
 			>
 				<svg

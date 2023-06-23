@@ -3,6 +3,8 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { FormEvent, Suspense, useState } from "react";
 import { useAuth } from "../auth";
+import DataCollapse from "../testing/collapse";
+import Votes from "./comment-votes";
 
 export default function Comments({ postId }: { postId: string }) {
 	return (
@@ -84,12 +86,16 @@ async function GetCommentsFeed() {
 
 	return (
 		<>
-			{comments!.map((comment) => (
-				<>
-					<p>{comment.text}</p>
-					<p>{comment.profiles.username}</p>
-				</>
-			))}
+			<DataCollapse data={comments} />
+			{comments!.map(
+				({ id, text, user_id, profiles: { username: author } }) => (
+					<div key={id} className="card card-bordered flex">
+						<Votes />
+						<p>{text}</p>
+						<p>{author}</p>
+					</div>
+				)
+			)}
 		</>
 	);
 }
