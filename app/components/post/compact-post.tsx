@@ -8,7 +8,7 @@ export default function CompactPost({
 		content,
 		id: postId,
 		post_votes: postVotes,
-		profiles: { username },
+		profiles: { avatar_url: avatarUrl, username: author },
 		title,
 	},
 }: {
@@ -19,16 +19,17 @@ export default function CompactPost({
 			<PostVotes postVotes={postVotes} postId={postId} />
 
 			<div className="flex flex-col no-underline gap-2">
-				<p>
-					Posted in{" "}
+				<div className="flex gap-1">
+					<p>Posted in</p>
 					<Link
 						href={`/c/${channelSlug}`}
 						className="link link-hover"
 					>
-						{channelName}.
+						{channelName}
 					</Link>
-					. Author: {username}
-				</p>
+					<p>by</p>
+					<p>{author}</p>
+				</div>
 				<Link href={`/c/${channelSlug}/post/${postId}`}>
 					<p className="text-xl leading-5 link link-hover">{title}</p>
 				</Link>

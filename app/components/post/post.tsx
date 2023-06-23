@@ -16,28 +16,32 @@ export default function Post({
 	post: PostWithJoins;
 }) {
 	return (
-		<div className="border-2 flex border-base-content gap-2 p-2 mb-4">
-			<PostVotes postVotes={postVotes} postId={postId} />
+		<div className="card card-bordered border-primary">
+			<div className="flex gap-2 p-2 mb-4">
+				<PostVotes postVotes={postVotes} postId={postId} />
 
-			<div className="flex flex-col gap-2">
-				<p>
-					Posted in{" "}
-					<Link
-						href={`/c/${channelSlug}`}
-						className="link link-hover"
-					>
-						{channelName}.
+				<div className="flex flex-col gap-2">
+					<p>
+						Posted in{" "}
+						<Link
+							href={`/c/${channelSlug}`}
+							className="link link-hover"
+						>
+							{channelName}.
+						</Link>
+						. Author: {username}
+					</p>
+
+					<Link href={`/c/${channelSlug}/post/${postId}`}>
+						<p className="text-xl leading-5 link link-hover">
+							{title}
+						</p>
 					</Link>
-					. Author: {username}
-				</p>
 
-				<Link href={`/c/${channelSlug}/post/${postId}`}>
-					<p className="text-xl leading-5 link link-hover">{title}</p>
-				</Link>
-
-				<p className="w-full text-sm">{content}</p>
-				<Comments postId={postId} />
+					<p className="w-full text-sm">{content}</p>
+				</div>
 			</div>
+			<Comments postId={postId} />
 		</div>
 	);
 }

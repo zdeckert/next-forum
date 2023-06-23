@@ -15,7 +15,7 @@ export default async function Home() {
 		slug
 	),
 	profiles(
-		username
+		username, avatar_url
 	),
 	post_votes (
 		id,

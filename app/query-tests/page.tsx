@@ -6,18 +6,14 @@ export default async function QueryTest() {
 		cookies,
 	});
 
-	const { data } = await supabase!.from("posts").select(`
-	            *,
-	            channels (
-	                name
-	            ),
-	            profiles(
-	                username
-	            ),
-	            post_votes (
-	                value,
-                    user_id
-	            )`);
+	const { data } = await supabase!.from("comments").select(`*,
+	comment_votes (
+		*
+	),
+	profiles (
+		id,
+		username, avatar_url 
+	)`);
 
 	return (
 		<div className="collapse bg-base-200">

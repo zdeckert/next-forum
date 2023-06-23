@@ -15,6 +15,7 @@ export interface PostWithJoins extends Post {
 		}
 	];
 	profiles: {
+		avatar_url: string;
 		username: string;
 	};
 }

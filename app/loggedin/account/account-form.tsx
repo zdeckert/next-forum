@@ -5,7 +5,7 @@ import {
 	createClientComponentClient,
 } from "@supabase/auth-helpers-nextjs";
 import { useCallback, useEffect, useState } from "react";
-import Avatar from "./avatar";
+import AvatarUpload from "./avatar-upload";
 
 export default function AccountForm({ session }: { session: Session }) {
 	const supabase = createClientComponentClient<Database>();
@@ -77,7 +77,7 @@ export default function AccountForm({ session }: { session: Session }) {
 		<div className="w-full flex justify-center">
 			<div className="card card-bordered border-2 border-accent bg-accent-content text-accent flex flex-col items-center gap-4 p-8 w-2/3">
 				<h2 className="text-xl font-semibold">Update Profile</h2>
-				<Avatar
+				<AvatarUpload
 					uid={user.id}
 					url={avatar_url}
 					size={150}

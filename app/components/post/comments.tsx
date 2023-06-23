@@ -3,17 +3,22 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { FormEvent, Suspense, useState } from "react";
 import { useAuth } from "../auth";
-import DataCollapse from "../testing/collapse";
 import CommentVotes from "./comment-votes";
 
 export default function Comments({ postId }: { postId: string }) {
 	return (
-		<div className="w-full">
-			<p className="text-xl">Comments</p>
+		<div className="w-full flex flex-col gap-4">
+			<div className="text-xl divider">Comments</div>
 
 			<NewComment postId={postId} />
 
-			<Suspense fallback={<p>Loading Comments</p>}>
+			<Suspense
+				fallback={
+					<div className="flex justify-center">
+						<p>Loading Comments</p>
+					</div>
+				}
+			>
 				<GetCommentsFeed />
 			</Suspense>
 		</div>
@@ -49,7 +54,7 @@ function NewComment({ postId }: { postId: string }) {
 	}
 
 	return session ? (
-		<>
+		<div className="px-4">
 			<p>Comment as {profile?.username}</p>
 			<form onSubmit={(e) => addComment(e)}>
 				<textarea
@@ -67,12 +72,13 @@ function NewComment({ postId }: { postId: string }) {
 					Comment
 				</button>
 			</form>
-		</>
+		</div>
 	) : null;
 }
 
 async function GetCommentsFeed() {
 	const supabase = createClientComponentClient();
+
 	const { data: comments } =
 		(await supabase.from("comments").select(
 			`*,
@@ -85,25 +91,145 @@ async function GetCommentsFeed() {
 		)) || [];
 
 	return (
-		<>
-			<DataCollapse data={comments} />
+		<div className="flex flex-col gap-4 px-4 pb-4">
 			{comments!.map(
 				({
 					id,
+					user_id: userId,
 					text,
 					profiles: { username: author },
 					comment_votes: commentVotes,
 				}) => (
-					<div key={id} className="card card-bordered flex">
+					<div
+						key={id}
+						className="card card-bordered flex flex-row p-2 gap-2"
+					>
 						<CommentVotes
 							commentId={id}
 							commentVotes={commentVotes}
 						/>
-						<p>{text}</p>
-						<p>{author}</p>
+						<Comment comment={{ author, text, id, userId }} />
 					</div>
 				)
 			)}
-		</>
+		</div>
+	);
+}
+
+function Comment({
+	comment: { author, id, text, userId },
+}: {
+	comment: {
+		author: string;
+		id: string;
+		text: string;
+		userId: string;
+	};
+}) {
+	const [showEdit, setShowEdit] = useState<boolean>(false);
+	const [showDelete, setShowDelete] = useState<boolean>(false);
+	const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
+	const [commentUpdate, setCommentUpdate] = useState<string>(text);
+	const [updateLoading, setUpdateLoading] = useState<boolean>(false);
+	const { session } = useAuth();
+
+	const isAuthor = userId === session?.user.id;
+
+	const supabase = createClientComponentClient();
+	const router = useRouter();
+
+	async function updateComment(e: FormEvent) {
+		e.preventDefault();
+		setUpdateLoading(true);
+		await supabase
+			.from("comments")
+			.update({
+				text: commentUpdate,
+			})
+			.eq("id", id);
+		setUpdateLoading(false);
+		setShowEdit(false);
+		router.refresh();
+	}
+
+	async function deleteComment(e: FormEvent) {
+		e.preventDefault();
+		setDeleteLoading(true);
+		await supabase.from("comments").delete().eq("id", id);
+		setDeleteLoading(false);
+		setShowDelete(false);
+		router.refresh();
+	}
+
+	return (
+		<div className="flex flex-col w-full">
+			<div className="flex w-full h-4 gap-2">
+				<p className="text-xs">author: {author}</p>
+				{isAuthor ? (
+					<>
+						<button
+							onClick={() => setShowEdit(!showEdit)}
+							className="text-xs link link-hover link-warning"
+						>
+							edit
+						</button>
+						{showDelete ? (
+							<div className="text-xs flex gap-1">
+								<p>confirm delete?</p>
+								<form
+									onSubmit={(e: FormEvent) =>
+										deleteComment(e)
+									}
+								>
+									<button
+										type="submit"
+										disabled={deleteLoading}
+										className="link link-hover link-error"
+									>
+										yes
+									</button>
+								</form>
+								<p>/</p>
+								<button
+									onClick={() => setShowDelete(false)}
+									className="link link-hover link-warning"
+								>
+									no
+								</button>
+							</div>
+						) : (
+							<button
+								onClick={() => setShowDelete(true)}
+								className="text-xs link link-hover link-error"
+							>
+								delete
+							</button>
+						)}
+					</>
+				) : null}
+			</div>
+			{showEdit ? (
+				<form className="w-full" onSubmit={(e) => updateComment(e)}>
+					<textarea
+						className="textarea w-full h-4 textarea-bordered"
+						onChange={(e) =>
+							setCommentUpdate(
+								(e.target as HTMLTextAreaElement).value
+							)
+						}
+						value={commentUpdate}
+					/>
+					<button
+						className="btn btn-warning btn-xs"
+						type="submit"
+						disabled={updateLoading}
+					>
+						update
+					</button>
+				</form>
+			) : (
+				<p>{text}</p>
+			)}
+		</div>
 	);
 }
