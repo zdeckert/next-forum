@@ -1,7 +1,7 @@
 import { PostWithJoins } from "@/lib/consts.types";
 import Link from "next/link";
-import CommentVotes from "./comment-votes";
 import Comments from "./comments";
+import PostVotes from "./post-votes";
 
 export default function Post({
 	post: {
@@ -17,7 +17,7 @@ export default function Post({
 }) {
 	return (
 		<div className="border-2 flex border-base-content gap-2 p-2 mb-4">
-			<CommentVotes postVotes={postVotes} postId={postId} />
+			<PostVotes postVotes={postVotes} postId={postId} />
 
 			<div className="flex flex-col gap-2">
 				<p>

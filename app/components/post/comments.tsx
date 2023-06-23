@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, Suspense, useState } from "react";
 import { useAuth } from "../auth";
 import DataCollapse from "../testing/collapse";
-import Votes from "./comment-votes";
+import CommentVotes from "./comment-votes";
 
 export default function Comments({ postId }: { postId: string }) {
 	return (
@@ -88,9 +88,17 @@ async function GetCommentsFeed() {
 		<>
 			<DataCollapse data={comments} />
 			{comments!.map(
-				({ id, text, user_id, profiles: { username: author } }) => (
+				({
+					id,
+					text,
+					profiles: { username: author },
+					comment_votes: commentVotes,
+				}) => (
 					<div key={id} className="card card-bordered flex">
-						<Votes />
+						<CommentVotes
+							commentId={id}
+							commentVotes={commentVotes}
+						/>
 						<p>{text}</p>
 						<p>{author}</p>
 					</div>

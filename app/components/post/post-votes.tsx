@@ -3,23 +3,27 @@ import { Database } from "@/lib/database.types";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useState } from "react";
 
-type CommentVotes = Database["public"]["Tables"]["comment_votes"]["Row"];
+type PostVotes = Database["public"]["Tables"]["post_votes"]["Row"];
 
-export default function CommentVotes({
-	commentVotes,
-	commentId,
+export default function PostVotes({
+	postVotes,
+	postId,
 }: {
-	commentVotes: CommentVotes[];
-	commentId: string;
+	postVotes: {
+		id: string;
+		value: number;
+		user_id: string;
+	}[];
+	postId: string;
 }) {
 	const { session } = useAuth();
 	const supabase = createClientComponentClient();
 
-	const { id: intialVoteId, value: initialVoteValue } = commentVotes.find(
+	const { id: intialVoteId, value: initialVoteValue } = postVotes?.find(
 		({ user_id }) => user_id === session?.user.id
 	) || { id: undefined, value: undefined };
 
-	const intialTotal = commentVotes.reduce((acc, { value }) => acc + value, 0);
+	const intialTotal = postVotes?.reduce((acc, { value }) => acc + value, 0);
 
 	const [voteValue, setVoteValue] = useState<number | undefined>(
 		initialVoteValue
@@ -37,14 +41,14 @@ export default function CommentVotes({
 
 		// if session with vote, pressing same button, remove vote
 		if (voteValue === inputValue) {
-			await supabase.from("comment_votes").delete().eq("id", voteId);
+			await supabase.from("post_votes").delete().eq("id", voteId);
 			setTotal(total - inputValue);
 		}
 
 		// if session with vote, update existing vote
 		if (voteValue && voteValue !== inputValue) {
 			await supabase
-				.from("comment_votes")
+				.from("post_votes")
 				.update({ value: inputValue })
 				.eq("id", voteId);
 			setTotal(total + 2 * inputValue);
@@ -54,9 +58,9 @@ export default function CommentVotes({
 		// save new vote id for further update, deletes, etc
 		if (voteValue === undefined) {
 			const { data, error } = await supabase
-				.from("comment_votes")
+				.from("post_votes")
 				.insert({
-					comment_id: commentId,
+					post_id: postId,
 					user_id: session.user.id,
 					value: inputValue,
 				})
