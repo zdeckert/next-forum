@@ -1,6 +1,7 @@
 import { PostWithJoins } from "@/lib/consts.types";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
+import Link from "next/link";
 import DataCollapse from "./components/testing/collapse";
 import Feed from "./feed";
 
@@ -27,6 +28,7 @@ export default async function Home() {
 		<>
 			<Feed posts={posts as PostWithJoins[]} />
 			<DataCollapse data={posts} />
+			<Link href="/loggedin/account">Account</Link>
 		</>
 	);
 }

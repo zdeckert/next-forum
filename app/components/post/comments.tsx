@@ -19,7 +19,7 @@ export default function Comments({ postId }: { postId: string }) {
 					</div>
 				}
 			>
-				<GetCommentsFeed />
+				<GetCommentsFeed postId={postId} />
 			</Suspense>
 		</div>
 	);
@@ -76,19 +76,22 @@ function NewComment({ postId }: { postId: string }) {
 	) : null;
 }
 
-async function GetCommentsFeed() {
+async function GetCommentsFeed({ postId }: { postId: string }) {
 	const supabase = createClientComponentClient();
 
 	const { data: comments } =
-		(await supabase.from("comments").select(
-			`*,
+		(await supabase
+			.from("comments")
+			.select(
+				`*,
 			comment_votes (
 				*
 			),
 			profiles (
 				username
 			)`
-		)) || [];
+			)
+			.eq("post_id", postId)) || [];
 
 	return (
 		<div className="flex flex-col gap-4 px-4 pb-4">
